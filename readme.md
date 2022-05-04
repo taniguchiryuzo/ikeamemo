@@ -1,7 +1,7 @@
 # プロダクトのタイトル
 
 医ケアメモ
-[]()
+[https://taniguchiryuzo.github.io/ikeamemo/](https://taniguchiryuzo.github.io/ikeamemo/)
 
 ## プロダクトの紹介
 
@@ -13,6 +13,7 @@
 - ログイン機能の実装
 - ログイン画面の日本語対応
 - 入力項目に合わせて、text や number を使い分けてみた
+- コレクションを 2 つ作成し、トップページで分岐するようにした。
 
 ## 苦戦した点，共有したいハマりポイントなど
 

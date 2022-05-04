@@ -9,16 +9,16 @@
   <title>chatApp</title>
     <style>
     #output li {
-      background: rgb(183, 245, 148);
+      background: rgb(229, 164, 235);
       width: 350px;
       list-style: none;
-
+      
     }
   </style>
 </head>
 
 <body>
-  <h1>はるくん医ケア記録</h1>
+  <h1>ゆいちゃん医ケア記録</h1>
   <!-- 入力場所を作成しよう -->
   <form>
     <fieldset>
@@ -33,7 +33,7 @@
         水分: <input type="number" id="water">
       </div>
       <div>
-        嘔吐: <input type="text" id="Vomiting">
+        てんかん: <input type="text" id="tenkan">
       </div>
       <div>
         <button type="button" id="send">送信</button>
@@ -97,13 +97,13 @@
       text: $("#text").val(),
       time: serverTimestamp(),
       water: $("#water").val(),
-      Vomiting: $("#Vomiting").val(),
+      tenkan: $("#tenkan").val(),
 
     };
-    addDoc(collection(db, "ikeakanrisheet"), postData);
+    addDoc(collection(db, "yuicaresheet"), postData);
     $("#text").val("");
     $("#water").val("");
-    $("#Vomiting").val("");
+    $("#tenkan").val("");
 
   });
 
@@ -116,17 +116,17 @@
           text: $("#text").val(),
           time: serverTimestamp(),
         };
-        addDoc(collection(db, "ikeakanrisheet"), postData);
+        addDoc(collection(db, "yuicaresheet"), postData);
         $("#text").val("");
         $("#water").val("");
-        $("#Vomiting").val("");
+        $("#tenkan").val("");
       }
     });
 
-  const q = query(collection(db, "ikeakanrisheet"), orderBy("time", "desc"));
+  const q = query(collection(db, "yuicaresheet"), orderBy("time", "desc"));
      // データ取得処理
     //  onSnapshotを使うと自動でデータを取得してくれる
-      onSnapshot(q,collection(db, "ikeakanrisheet"), (querySnapshot) => {
+      onSnapshot(q,collection(db, "yuicaresheet"), (querySnapshot) => {
         console.log(querySnapshot.docs);
 
          // 前項の`console.log()`下に記述
@@ -152,7 +152,7 @@
       <p>${document.data.name} at ${convertTimestampToDatetime(document.data.time.seconds)}</p>
       <p>様子：${document.data.text}</p>
       <p>水分注入（ml）:${document.data.water}</p>
-      <p>嘔吐：${document.data.Vomiting}</p>
+      <p>てんかん：${document.data.tenkan}</p>
 
     </li>
   `);
