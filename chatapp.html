@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>chatApp</title>
+    <style>
+    #output li {
+      background: rgb(183, 245, 148);
+      /* list-style: none; */
+    }
+  </style>
+</head>
+
+<body>
+  <h1>医ケア共有アプリ</h1>
+  <!-- 入力場所を作成しよう -->
+  <form>
+    <fieldset>
+      <legend>チャット入力画面</legend>
+      <div>
+        担当: <input type="text" id="name">
+      </div>
+      <div>
+        様子: <input type="text" id="text">
+      </div>
+      <div>
+        水分: <input type="number" id="water">
+      </div>
+      <div>
+        嘔吐: <input type="text" id="Vomiting">
+      </div>
+      <div>
+        <button type="button" id="send">send</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <!-- データ出力場所 -->
+  <ul id="output"></ul>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    // 日時をいい感じの形式にする関数
+    function convertTimestampToDatetime(timestamp) {
+      const _d = timestamp ? new Date(timestamp * 1000) : new Date();
+      const Y = _d.getFullYear();
+      const m = (_d.getMonth() + 1).toString().padStart(2, '0');
+      const d = _d.getDate().toString().padStart(2, '0');
+      const H = _d.getHours().toString().padStart(2, '0');
+      const i = _d.getMinutes().toString().padStart(2, '0');
+      const s = _d.getSeconds().toString().padStart(2, '0');
+      return `${Y}/${m}/${d} ${H}:${i}:${s}`;
+    }
+  </script>
+  <!-- 以下にfirebaseのコードを貼り付けよう -->
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.7.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+ 
+  import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      onSnapshot,
+      query,
+      orderBy,
+    } from "https://www.gstatic.com/firebasejs/9.7.0/firebase-firestore.js";
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "",
+    authDomain: "ikeakanri.firebaseapp.com",
+    projectId: "ikeakanri",
+    storageBucket: "ikeakanri.appspot.com",
+    messagingSenderId: "653416780116",
+    appId: "1:653416780116:web:620094e651fc69081b38c1"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+
+  const db = getFirestore(app);
+
+
+  $("#send").on("click", function () {
+    // 送信時に必要な処理
+    const postData = {
+      name: $("#name").val(),
+      text: $("#text").val(),
+      time: serverTimestamp(),
+      water: $("#water").val(),
+      Vomiting: $("#Vomiting").val(),
+
+    };
+    addDoc(collection(db, "ikeakanrisheet"), postData);
+    $("#text").val("");
+    $("#water").val("");
+    $("#Vomiting").val("");
+
+  });
+
+  // chatapp.html
+
+    $("#text").on("keydown", function (e) {
+      if (e.keyCode === 13) {
+        const postData = {
+          name: $("#name").val(),
+          text: $("#text").val(),
+          time: serverTimestamp(),
+        };
+        addDoc(collection(db, "ikeakanrisheet"), postData);
+        $("#text").val("");
+        $("#water").val("");
+        $("#Vomiting").val("");
+      }
+    });
+
+  const q = query(collection(db, "ikeakanrisheet"), orderBy("time", "desc"));
+     // データ取得処理
+    //  onSnapshotを使うと自動でデータを取得してくれる
+      onSnapshot(q,collection(db, "ikeakanrisheet"), (querySnapshot) => {
+        console.log(querySnapshot.docs);
+
+         // 前項の`console.log()`下に記述
+
+        const documents = [];
+        querySnapshot.docs.forEach(function (doc) {
+          const document = {
+            id: doc.id,
+            data: doc.data(),
+          };
+          documents.push(document);
+        });
+
+        console.log(documents);
+
+        // chatapp.html
+        // 前項の`console.log()`下に記述
+
+        const htmlElements = [];
+        documents.forEach(function (document) {
+          htmlElements.push(`
+    <li id="${document.id}">
+      <p>${document.data.name} at ${convertTimestampToDatetime(document.data.time.seconds)}</p>
+      <p>様子：${document.data.text}</p>
+      <p>水分注入（ml）:${document.data.water}</p>
+      <p>嘔吐：${document.data.Vomiting}</p>
+
+    </li>
+  `);
+        });
+
+        $("#output").html(htmlElements);
+
+
+
+      });
+
+
+</script>
+
+   
+
+</body>
+
+</html>
